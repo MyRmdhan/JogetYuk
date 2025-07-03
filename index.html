@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pose Rhythm Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- === Background Video === -->
+    <video id="bg-video" autoplay muted loop>
+      <source src="assets/background3.mp4" type="video/mp4" />
+      Browser kamu tidak mendukung video background.
+    </video>
+
+    <!-- === Welcome Screen === -->
+    <div id="welcome-screen">
+      <img
+        src="assets/logo.png"
+        alt="Logo JogetYuk"
+        style="width: 650px; height: auto; margin-bottom: 20px"
+      />
+      <h2>Selamat Datang di game <strong>💃JOGETYUK🕺</strong></h2>
+      <h2>by M.Y.R</h2>
+      <p>Siap menguji refleks dan gerakanmu dengan pose seru?</p>
+      <button id="welcome-next-btn">Lanjut</button>
+    </div>
+
+    <!-- === How to Play Screen === -->
+    <div
+      id="howto-screen"
+      style="display: none; font-family: Arial, sans-serif"
+    >
+      <h2>Cara Bermain</h2>
+      <p>
+        Dalam permainan ini, kamu harus
+        <strong>melakukan pose tubuh</strong> sesuai dengan
+        <strong>panah yang muncul</strong> di layar.<br /><br />
+        Panah-panah akan bergerak dari bawah ke atas. Tugasmu adalah:
+      </p>
+
+      <ul
+        style="
+          text-align: left;
+          max-width: 600px;
+          margin: 10px auto;
+          line-height: 1.6;
+        "
+      >
+        <li>
+          Amati arah panah (⬅️ ⬆️ ➡️) yang mendekati panah target di bagian
+          atas.
+        </li>
+        <li>
+          Saat panah menyentuh target, segera lakukan pose sesuai arah panah
+          tersebut:
+          <ul style="list-style-type: square">
+            <li>
+              <strong>⬅️ Kiri:</strong> Gunakan tangan kanan dan arahkan ke arah
+              kiri.
+            </li>
+            <li><strong>⬆️ Atas:</strong> Angkat kedua tangan ke atas.</li>
+            <li>
+              <strong>➡️ Kanan:</strong> Gunakan tangan kiri dan arahkan ke
+              kanan.
+            </li>
+          </ul>
+        </li>
+
+        <!-- === Pose Guide with Floating Images === -->
+        <div
+          id="pose-guide"
+          style="
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+          "
+        >
+          <div style="text-align: center">
+            <img class="float-img" src="assets/pose-kiri.png" alt="Pose Kiri" />
+            <div>pose kiri</div>
+          </div>
+          <div style="text-align: center">
+            <img class="float-img" src="assets/pose-atas.png" alt="Pose Atas" />
+            <div>pose atas</div>
+          </div>
+          <div style="text-align: center">
+            <img
+              class="float-img"
+              src="assets/pose-kanan.png"
+              alt="Pose Kanan"
+            />
+            <div>pose kanan</div>
+          </div>
+        </div>
+
+        <!-- Float animation styles -->
+        <style>
+          .float-img {
+            animation: float 2.5s ease-in-out infinite;
+            will-change: transform;
+          }
+          .float-img:nth-child(1) {
+            animation-delay: 0s;
+          }
+          .float-img:nth-child(2) {
+            animation-delay: 0.8s;
+          }
+          .float-img:nth-child(3) {
+            animation-delay: 1.6s;
+          }
+
+          @keyframes float {
+            0% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-10px);
+            }
+            100% {
+              transform: translateY(0);
+            }
+          }
+        </style>
+
+        <li>
+          Jika kamu bergerak terlalu cepat sebelum panah menyentuh target, maka
+          akan dianggap
+          <span style="color: rgb(255, 16, 79)"><strong>Too Early</strong></span
+          >.
+        </li>
+        <li>
+          Jika kamu terlambat atau salah pose, akan dianggap
+          <span style="color: rgb(255, 16, 79)"><strong>Miss</strong></span
+          >.
+        </li>
+        <li>
+          Jika pose kamu tepat maka akan mendapatkan:
+          <span style="color: rgb(0, 255, 4)">
+            <strong>Perfect</strong>, <strong>Good</strong>,
+            <strong>Nice</strong> </span
+          >.
+        </li>
+      </ul>
+
+      <p>
+        Permainan berlangsung menyesuaikan <strong>Durasi Musik</strong>.
+        Dapatkan skor sebanyak-banyaknya sebelum waktu habis!
+      </p>
+
+      <button id="howto-start-btn">Mulai Bermain</button>
+    </div>
+
+    <!-- === Main Game Container === -->
+    <div id="main-container">
+      <!-- Difficulty Selection -->
+      <div id="difficulty-selection">
+        <h2>Pilih Tingkat Kesulitan</h2>
+        <button id="btnlvl" onclick="selectDifficulty('easy')">Easy</button>
+        <button id="btnlvl" onclick="selectDifficulty('normal')">Normal</button>
+        <button id="btnlvl" onclick="selectDifficulty('hard')">Hard</button>
+      </div>
+
+      <!-- Game Box -->
+      <div id="game-box">
+        <h1>🎵🕺 JogetYuk 🕺🎵</h1>
+
+        <div id="canvas-row">
+          <canvas id="game-canvas" width="400" height="400"></canvas>
+          <div id="webcam-container"></div>
+        </div>
+
+        <p>Pose kamu sekarang: <span id="pose-result">-</span></p>
+
+        <button id="start-btn">Mulai Bermain</button>
+
+        <!-- Music Selection -->
+        <label
+          id="label-pilih"
+          for="music-select"
+          style="display: block; margin-top: 10px; color: white"
+        >
+          Pilih Lagu:
+        </label>
+        <select id="music-select">
+          <option value="assets/COBOY JUNIOR - Kamu.mp3">
+            COBOY JUNIOR - Kamu
+          </option>
+          <option value="assets/Heavy Rotation.mp3">
+            jkt48 - Heavy Rotation
+          </option>
+          <option value="assets/Jkt 48 - Fortune Cookie.mp3">
+            Jkt 48 - Fortune Cookie
+          </option>
+          <option value="assets/Audition - Every Day.mp3">
+            Audition - Every Day
+          </option>
+          <option value="assets/Audition - With You.mp3">
+            Audition - With You
+          </option>
+          <option value="assets/music.mp3">IDK - lagu seru</option>
+          <option value="assets/PSY - GANGNAM STYLE.mp3">
+            PSY - GANGNAM STYLE
+          </option>
+          <option value="assets/test.mp3">IDK - test game</option>
+        </select>
+
+        <button id="restart-btn" style="display: none">Main Lagi</button>
+      </div>
+    </div>
+
+    <!-- === Library (Offline Teachable Machine & TensorFlow) === -->
+    <script src="./lib/tf.min.js"></script>
+    <script src="./lib/teachablemachine-pose.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
