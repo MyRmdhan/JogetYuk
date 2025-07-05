@@ -141,14 +141,19 @@ function resetGame() {
   soundEffects.button.play();
   gameStarted = false;
   gameEnded = false;
-  totalMisses = 0;
 
+  totalMisses = 0;
   score = 0;
   arrows = [];
   floatingTexts = [];
   timerValue = 120;
   countdownValue = 3;
 
+  // Tambahan penting:
+  clearInterval(timerInterval);
+  clearInterval(countdownInterval);
+
+  // Tampilkan ulang tampilan awal game
   document.getElementById("game-box").style.display = "none";
   document.getElementById("difficulty-selection").style.display = "block";
   document.getElementById("restart-btn").style.display = "none";
@@ -167,20 +172,21 @@ function resetGame() {
 }
 
 function startTimer() {
+  // Pastikan hanya satu interval aktif
+  if (timerInterval) clearInterval(timerInterval);
+
   timerInterval = setInterval(() => {
     timerValue--;
+
     if (timerValue <= 0) {
       clearInterval(timerInterval);
       gameStarted = false;
       gameEnded = true;
-      document.getElementById("restart-btn").style.display = "inline-block";
 
-      // Hentikan lagu jika sedang diputar
-      if (currentAudio) {
-        currentAudio.pause();
-      }
+      if (currentAudio) currentAudio.pause();
+      document.getElementById("restart-btn").style.display = "inline-block";
     }
-  }, 1000);
+  }, 1000); // Timer 1 detik normal
 }
 
 function startArrowLoop() {
